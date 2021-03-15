@@ -1,6 +1,7 @@
 import React from 'react';
 import { Alert, Button, Card, Col, Row } from 'react-bootstrap';
 import LoadSpinner from '../UI/LoadSpinner';
+import Icon from 'react-web-vector-icons';
 
 const collectVariant = (collect) => {
     if (collect.loading) {
@@ -27,6 +28,7 @@ function Homepage({ name, collect, results, cb }) {
     const rError = results.error;
     const rLoading = results.loading;
     const rData = results.data;
+    const rBreakerEnabled = results.rBreakerEnabled;
 
     return <div>
         <div>
@@ -41,18 +43,25 @@ function Homepage({ name, collect, results, cb }) {
                             <Row>
                                 <Col>
                                     <Alert variant={collectVariant(collect)}>
-                                        Status: {cError ? cError : cStatus}
-                                        {collect.checked ?
-                                            <Button className="float-right" variant="success" disabled={collect.disabled} onClick={_ => cb.onChangeCollect(true)}>
-                                                Enable Endpoint
-                                            </Button>
-                                            :
-                                            <Button className="float-right" variant="secondary" disabled={collect.disabled} onClick={_ => cb.onChangeCollect(false)}>
-                                                Disable Endpoint
-                                            </Button>
-                                        }
-                                        <br />
-                                        <br />
+                                        <Row>
+                                            <Col>
+                                                Status: {cError ? cError : cStatus}
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col>
+
+                                                {collect.checked ?
+                                                    <Button className="float-right" variant="success" disabled={collect.disabled} onClick={_ => cb.onChangeCollect(true)}>
+                                                        Enable Endpoint <Icon name="ethernet-cable" font="MaterialCommunityIcons" color="white" size={"1.5rem"} />
+                                                    </Button>
+                                                    :
+                                                    <Button className="float-right" variant="warning" disabled={collect.disabled} onClick={_ => cb.onChangeCollect(false)}>
+                                                        Disable Endpoint <Icon name="ethernet-cable-off" font="MaterialCommunityIcons" color="white" size={"1.5rem"} />
+                                                    </Button>
+                                                }
+                                            </Col>
+                                        </Row>
                                     </Alert>
                                 </Col>
                             </Row>
@@ -68,24 +77,38 @@ function Homepage({ name, collect, results, cb }) {
                             <Row>
                                 <Col>
                                     <Alert variant={collectVariant(results)}>
-                                        Status: {rError ? rError : rStatus}
-                                        <Card>
-                                            <Card.Header>
-                                                Results
+                                        <Row>
+                                            <Col>
+                                                Status: {rError ? rError : rStatus}
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col>
+                                                <Button onClick={cb.onClickRetrieve}>Retrieve results <Icon name="download" font="MaterialCommunityIcons" color="white" size={"1.5rem"} /></Button>
+                                                <Button onClick={cb.onClickCircuitBreaker} className="float-right">{rBreakerEnabled ? "Disable" : "Enable"} Circuit Breaker <Icon name="arrow-decision" font="MaterialCommunityIcons" color="white" size={"1.5rem"} /></Button>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col>&nbsp;</Col>
+                                        </Row>
+                                        <Row>
+                                            <Col>
+                                                <Card>
+                                                    <Card.Header>
+                                                        Results
                                             </Card.Header>
-                                            <Card.Body>
-                                                <Button onClick={cb.onClickRetrieve}>Retrieve results</Button>
-                                                {rData &&
-                                                    <Alert variant={(rData === "old results") ? "warning" : "success"}>
-                                                        <ul>
-                                                            {rData.map((item, index) =>
-                                                                <li key={index}>{item}</li>
-                                                            )}
-                                                        </ul>
-                                                    </Alert>
-                                                }
-                                            </Card.Body>
-                                        </Card>
+                                                    <Card.Body>
+                                                        {rData &&
+                                                            <ul>
+                                                                {rData.map((item, index) =>
+                                                                    <li key={index}>{item}</li>
+                                                                )}
+                                                            </ul>
+                                                        }
+                                                    </Card.Body>
+                                                </Card>
+                                            </Col>
+                                        </Row>
                                     </Alert>
                                 </Col>
                             </Row>

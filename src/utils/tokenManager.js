@@ -13,7 +13,7 @@ export default class tokenManager {
 
     static loadApiUser() {
         this.store.dispatch(loadingApiUser());
-        const tokenString = localStorage.getItem('dehia.auth');
+        const tokenString = sessionStorage.getItem('dehia.auth');
         const storedAuth = tokenString ? JSON.parse(tokenString) : null;
         if (storedAuth && storedAuth.token) {
             this.reauthIfNeeded(storedAuth).then(
@@ -69,13 +69,13 @@ export default class tokenManager {
     static expireUser() {
         if (window.location.pathname !== "/callback") {
             sessionStorage.setItem('returnPath', window.location.pathname + window.location.search);
-            localStorage.removeItem('dehia.auth');
+            sessionStorage.removeItem('dehia.auth');
         }
         this.store.dispatch(apiUserExpired());
     }
 
     static storeApiUser(auth) {
-        localStorage.setItem('dehia.auth', JSON.stringify(auth));
+        sessionStorage.setItem('dehia.auth', JSON.stringify(auth));
         this.client.setAuth(auth);
     }
 

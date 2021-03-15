@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { createStore, compose } from 'redux'
 import { Provider } from 'react-redux'
 import reducer from './redux/index';
+import './icons';
 
 import App from './App';
 import tokenManager from './utils/tokenManager';
