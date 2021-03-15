@@ -17,7 +17,13 @@ export default class tokenManager {
         const storedAuth = tokenString ? JSON.parse(tokenString) : null;
         if (storedAuth && storedAuth.token) {
             this.reauthIfNeeded(storedAuth).then(
-                auth => this.storeUserIfValidJWT(auth)
+                auth => {
+                    if (auth) {
+                        this.storeUserIfValidJWT(auth)
+                    } else {
+                        this.expireUser()
+                    }
+                }
             ).catch(_ => this.expireUser())
         } else {
             console.log("Token not found")
@@ -27,7 +33,6 @@ export default class tokenManager {
 
     static storeUserIfValidJWT(auth) {
         const token = auth.token;
-        console.log("verifying JWT")
         const jwtContents = verifyJWTSignature(token);
         if (jwtContents) {
             const storedAuth = { token, expiresAt: expiresAt(jwtContents.exp) }
@@ -47,11 +52,13 @@ export default class tokenManager {
     static async reauthIfNeeded(token) {
         if (expired(token.expiresAt)) {
             this.login()
-                .then(data => {
-                    if (data.error_code) {
-                        console.log("invalid ID")
-                    } else {
-                        this.storeUserIfValidJWT(data);
+                .then(response => {
+                    if(response.data) {
+                        if (response.data.error_code) {
+                            console.log("invalid ID")
+                        } else {
+                            this.storeUserIfValidJWT(response.data);
+                        }
                     }
                 });
         } else {
@@ -92,6 +99,11 @@ export default class tokenManager {
         return this.client.deleteResourceSwitch();
     }
 
-    //TODO: getResultsStatus
-    //TODO: getResults
+    static getResultsStatus() {
+        return this.client.getResultsStatus();
+    }
+
+    static getResults() {
+        return this.client.getResults();
+    }
 }

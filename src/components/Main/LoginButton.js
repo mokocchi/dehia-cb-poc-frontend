@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React from 'react';
 import { Component } from 'react';
 import { Button } from 'react-bootstrap';
@@ -18,7 +19,7 @@ class LoginButton extends Component {
     }
 
     pingGateway = async () => {
-        fetch(API_HOST).then(res => {
+        axios(API_HOST).then(res => {
             if (res.status === 200) {
                 this.setState({
                     loading: false

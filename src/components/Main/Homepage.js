@@ -18,10 +18,16 @@ const collectVariant = (collect) => {
             return "primary";
     }
 }
-function Homepage({ name, collect, cb }) {
+function Homepage({ name, collect, results, cb }) {
     const cStatus = collect.status;
     const cError = collect.error;
     const cLoading = collect.loading;
+
+    const rStatus = results.status;
+    const rError = results.error;
+    const rLoading = results.loading;
+    const rData = results.data;
+
     return <div>
         <div>
             {name}'s Session
@@ -45,8 +51,8 @@ function Homepage({ name, collect, cb }) {
                                                 Disable Endpoint
                                             </Button>
                                         }
-                                        <br/>
-                                        <br/>
+                                        <br />
+                                        <br />
                                     </Alert>
                                 </Col>
                             </Row>
@@ -55,6 +61,37 @@ function Homepage({ name, collect, cb }) {
                 </Card>
             </Col>
             <Col>
+                <Card>
+                    <Card.Header>Results Service</Card.Header>
+                    <Card.Body>
+                        {rLoading ? <LoadSpinner /> : (
+                            <Row>
+                                <Col>
+                                    <Alert variant={collectVariant(results)}>
+                                        Status: {rError ? rError : rStatus}
+                                        <Card>
+                                            <Card.Header>
+                                                Results
+                                            </Card.Header>
+                                            <Card.Body>
+                                                <Button onClick={cb.onClickRetrieve}>Retrieve results</Button>
+                                                {rData &&
+                                                    <Alert variant={(rData === "old results") ? "warning" : "success"}>
+                                                        <ul>
+                                                            {rData.map((item, index) =>
+                                                                <li key={index}>{item}</li>
+                                                            )}
+                                                        </ul>
+                                                    </Alert>
+                                                }
+                                            </Card.Body>
+                                        </Card>
+                                    </Alert>
+                                </Col>
+                            </Row>
+                        )}
+                    </Card.Body>
+                </Card>
             </Col>
         </Row>
     </div>

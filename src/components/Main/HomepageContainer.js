@@ -13,12 +13,50 @@ class HomepageContainer extends Component {
                 disabled: true,
                 checked: false
             },
-            results: {}
+            results: {
+                loading: true,
+                error: null
+            },
         }
     }
 
     componentDidMount() {
         this.loadStatus();
+    }
+
+    onClickRetrieve = _ => {
+        const results = this.state.results;
+        results.loading = true;
+        this.setState({
+            results
+        })
+        tokenManager.getResults().then(response => {
+            if (response.data) {
+                if (response.data.error_code) {
+                    const results = {};
+                    results.error = response.data.user_message;
+                    results.loading = false;
+                    this.setState({
+                        results
+                    })
+                } else {
+                    const results = {};
+                    results.status = "OK";
+                    results.data = response.data.results;
+                    results.loading = false;
+                    this.setState({
+                        results
+                    })
+                }
+            } else {
+                const results = {};
+                results.error = "Error";
+                results.loading = false;
+                this.setState({
+                    results
+                })
+            }
+        })
     }
 
     onChangeCollect = (enable) => {
@@ -75,7 +113,7 @@ class HomepageContainer extends Component {
                 if (response.error_code) {
                     this.setState({
                         collect: {
-                            error: response.user_message,
+                            error: response.data.user_message,
                             loading: false,
                             disabled: true
                         }
@@ -83,7 +121,32 @@ class HomepageContainer extends Component {
                 } else {
                     this.setState({
                         collect: {
-                            status: response.status,
+                            status: response.data.status,
+                            loading: false,
+                            checked: response.data.status !== "OK",
+                            disabled: false
+                        }
+                    })
+                }
+            }
+        ).catch(error => console.log(error));
+    }
+
+    loadResultsStatus = () => {
+        tokenManager.getResultsStatus().then(
+            response => {
+                if (response.error_code) {
+                    this.setState({
+                        results: {
+                            error: response.data.user_message,
+                            loading: false,
+                            disabled: true
+                        }
+                    })
+                } else {
+                    this.setState({
+                        results: {
+                            status: response.data.status,
                             loading: false,
                             checked: response.status !== "OK",
                             disabled: false
@@ -95,19 +158,26 @@ class HomepageContainer extends Component {
     }
 
     loadStatus = async () => {
-        //collect status
         this.loadCollectStatus();
-
+        this.loadResultsStatus();
     }
 
     render() {
-        return <Homepage name={this.props.name} collect={this.state.collect} cb={{ onChangeCollect: this.onChangeCollect }} />
+        return <Homepage
+            name={this.props.name}
+            collect={this.state.collect}
+            results={this.state.results}
+            cb={{
+                onChangeCollect: this.onChangeCollect,
+                onClickRetrieve: this.onClickRetrieve
+            }}
+        />
     }
 }
 
 function mapStateToProps(state) {
     return {
-        name: "Juan"
+        name: state.auth.name
     }
 }
 export default connect(mapStateToProps)(HomepageContainer);

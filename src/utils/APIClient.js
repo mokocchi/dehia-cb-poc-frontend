@@ -1,5 +1,6 @@
 import { TOKEN_AUTH_URL, API_BASE_URL } from "../config";
 import { expired, expiresAt } from "./utils";
+import axios from 'axios';
 import tokenManager from "./tokenManager";
 
 export default class APIClient {
@@ -8,31 +9,25 @@ export default class APIClient {
     }
 
     async login() {
-        return fetch(TOKEN_AUTH_URL, {
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                //TODO: add ID
-                "token": true
-            })
+        return axios.post(TOKEN_AUTH_URL, {
+            //TODO: add ID
+            token: true
         }).then(
             async response => {
-                return response.json().then(
-                    data => {
-                        if (data.error_code) {
-                            console.log(data);
-                        } else {
-                            const auth = {
-                                token: data.accessToken,
-                                expiresAt: expiresAt(data.expires_in)
-                            }
-                            this.setAuth(auth);
-                            return auth;
+                if(response.data) {
+                    if (response.data.error_code) {
+                        console.log(response.data);
+                    } else {
+                        const auth = {
+                            token: response.data.accessToken,
+                            expiresAt: expiresAt(response.data.expires_in)
                         }
+                        this.setAuth(auth);
+                        return auth;
                     }
-                )
+                } else {
+                    console.log("Auth error")
+                }
             }
         ).catch(error => {
             console.log(error);
@@ -53,24 +48,16 @@ export default class APIClient {
             this.loginFromStoredTokenId();
         }
         parameters.headers = {
-            "Authorization": "Bearer " + this.auth.token
-        }
-        if (json) {
-            parameters.headers["Content-Type"] = "application/json"
+            "Authorization": "Bearer " + this.auth.token,
+            "Content-Type": json ? "application/json" : ""
         }
         try {
-            const response = await fetch(API_BASE_URL + uri, parameters);
-            return await response.json();
+            return await axios({ url: API_BASE_URL + uri, method: parameters.method, data: parameters.body || {}, headers: parameters.headers });
         } catch (error) {
             return {
                 user_message: "There was an error", error_code: 0
             }
         }
-    }
-
-    async unauthorizedRequest(uri, parameters = {}) {
-        const response = await fetch(API_BASE_URL + '/public' + uri, parameters);
-        return await response.json();
     }
 
     async authorizedGetRequest(uri) {
@@ -120,5 +107,13 @@ export default class APIClient {
 
     deleteResourceSwitch() {
         return this.authorizedDeleteRequest('/switch')
+    }
+
+    getResultsStatus() {
+        return this.authorizedGetRequest('/results-status');
+    }
+
+    getResults() {
+        return this.authorizedGetRequest('/results');
     }
 }
