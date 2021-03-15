@@ -63,7 +63,7 @@ export default class APIClient {
             return await response.json();
         } catch (error) {
             return {
-                user_message: "Ocurrió un error", error_code: 0
+                user_message: "There was an error", error_code: 0
             }
         }
     }
@@ -77,13 +77,14 @@ export default class APIClient {
         return this.authorizedRequest(uri);
     }
 
-    async authorizedPostRequest(uri, object, stringify = true) {
-        return this.getToken().then(token => {
-            return this.authorizedRequest(token, uri, {
-                body: stringify ? JSON.stringify(object) : object,
-                method: 'POST'
-            }, stringify)
-        })
+    async authorizedPostRequest(uri, object = {}, stringify = true) {
+        if (!this.validAuth(this.auth)) {
+            this.loginFromStoredTokenId();
+        }
+        return this.authorizedRequest(uri, {
+            body: stringify ? JSON.stringify(object) : object,
+            method: 'POST'
+        }, stringify)
     }
 
     authorizedPutRequest(uri, object, stringify = true) {
@@ -103,11 +104,21 @@ export default class APIClient {
     }
 
     authorizedDeleteRequest(uri) {
-        const token = this.getToken();
-        return this.authorizedRequest(token, uri, { method: 'DELETE' });
+        if (!this.validAuth(this.auth)) {
+            this.loginFromStoredTokenId();
+        }
+        return this.authorizedRequest(uri, { method: 'DELETE' });
     }
 
     getCollectStatus() {
         return this.authorizedGetRequest('/collect-status');
+    }
+
+    postResourceSwitch() {
+        return this.authorizedPostRequest('/switch')
+    }
+
+    deleteResourceSwitch() {
+        return this.authorizedDeleteRequest('/switch')
     }
 }

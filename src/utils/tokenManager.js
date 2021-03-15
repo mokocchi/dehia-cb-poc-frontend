@@ -84,7 +84,14 @@ export default class tokenManager {
         return this.client.getCollectStatus();
     }
 
+    static createResourceSwitch() {
+        return this.client.postResourceSwitch();
+    }
+
+    static removeResourceSwitch() {
+        return this.client.deleteResourceSwitch();
+    }
+
     //TODO: getResultsStatus
-    //TODO: postResourceSwitch
     //TODO: getResults
 }
