@@ -11,18 +11,100 @@ class HomepageContainer extends Component {
                 loading: true,
                 error: null,
                 disabled: true,
-                checked: false
+                checked: false,
+                status: null
             },
             results: {
                 loading: true,
                 resultsLoading: false,
-                error: null
+                error: null,
+                circuitBreakerEnabled: false,
+                circuitBreakerLoading: false
             },
+            metrics: {
+                testStarted: false,
+                step: 0,
+                text: [],
+                loading: false,
+                stop: false
+            }
         }
     }
 
     componentDidMount() {
         this.loadStatus();
+    }
+
+    stopTest = _ => {
+        const metrics = this.state.metrics;
+        metrics.stop = true;
+        metrics.loading = false;
+        this.setState({
+            metrics
+        })
+    }
+
+    startTest = async _ => {
+        let metrics = this.state.metrics;
+        metrics.testStarted = true;
+        metrics.stop = false;
+        this.setState({
+            metrics
+        })
+        let text = [];
+        const elapsedTimes = [];
+        if (this.state.collect.status === "OK") {
+            text[0] = "Operation should be normal. Sending first request...";
+        } else {
+            if(this.state.results.circuitBreakerEnabled){
+                text[0] = "Circuit breaker enabled. Sending first request..."
+            } else {
+                text[0] = "Circuit breaker disabled. Sending first request..."
+            }
+        }
+        metrics = this.state.metrics;
+        metrics.text = text;
+        metrics.loading = true;
+        this.setState({
+            metrics
+        })
+        for (let index = 1; index <= 10; index++) {
+            if (this.state.metrics.stop) {
+                text[text.length] = "Test stopped";
+                metrics.text = text;
+                this.setState({
+                    metrics
+                })
+                return;
+            }
+            const time1 = Date.now();
+            let failed;
+            try {
+                const response = await tokenManager.getResults();
+                failed = response.data.error_code !== undefined;
+            } catch (e) {
+                failed = true;
+            }
+            const time2 = Date.now();
+            const interval = new Date(time2).getTime() - new Date(time1).getTime();
+            text[index] = `Request ${index}. Elapsed time: ${interval}ms (${failed ? "Failed" : "Success"})`;
+            elapsedTimes[index - 1] = interval;
+            metrics.step = index;
+            metrics.text = text;
+            this.setState({
+                metrics
+            })
+        }
+        const avg = elapsedTimes.reduce((x, y) => x + y) / 10;
+        const avg2 = elapsedTimes.slice(1, 9).reduce((x, y) => x + y) / 9;
+        const max = elapsedTimes.reduce((x, y) => (x > y) ? x : y);
+        const min = elapsedTimes.reduce((x, y) => (x < y) ? x : y);
+        metrics.loading = false;
+        text[11] = `Average: ${avg.toFixed(2)}ms.`;
+        text[12] = `Max time: ${max}ms. Min time: ${min}ms`;
+        this.setState({
+            metrics
+        });
     }
 
     onClickRetrieve = _ => {
@@ -34,24 +116,24 @@ class HomepageContainer extends Component {
         tokenManager.getResults().then(response => {
             if (response.data) {
                 if (response.data.error_code) {
-                    const results = {};
+                    const results = this.state.results;
                     results.error = response.data.user_message;
                     results.resultsLoading = false;
                     this.setState({
                         results
                     })
                 } else {
-                    const results = {};
-                    results.status = "OK";
+                    const results = this.state.results;
                     results.data = response.data.results;
                     results.resultsLoading = false;
+                    results.error = null;
                     this.setState({
                         results
                     })
                 }
             } else {
-                const results = {};
-                if(response.developer_message) {
+                const results = this.state.results;
+                if (response.developer_message) {
                     results.error = response.developer_message;
                 } else {
                     results.error = "Unknown Error";
@@ -62,6 +144,79 @@ class HomepageContainer extends Component {
                 })
             }
         })
+    }
+
+    onChangeBreaker = (enable) => {
+        if (enable) {
+            const results = this.state.results;
+            results.circuitBreakerLoading = true;
+            this.setState({
+                results
+            })
+            tokenManager.enableCircuitBreaker().then(res => {
+                if (res.data.error_code) {
+                    console.log(res);
+                    this.setState({
+                        results: {
+                            circuitBreakerEnabled: false,
+                            circuitBreakerLoading: false,
+                            error: "Error"
+                        }
+                    })
+                } else {
+                    this.setState({
+                        results: {
+                            circuitBreakerLoading: false,
+                            circuitBreakerEnabled: true,
+                            error: null,
+                            status: "Circuit breaker enabled"
+                        }
+                    })
+                }
+            }).catch(error => {
+                console.log(error)
+                this.setState({
+                    results: {
+                        circuitBreakerEnabled: false,
+                        circuitBreakerLoading: false,
+                        error: "Error"
+                    }
+                })
+            })
+        } else {
+            const results = this.state.results;
+            results.circuitBreakerLoading = true;
+            this.setState({
+                results
+            })
+            tokenManager.disableCircuitBreaker().then(res => {
+                if (res.data.error_code) {
+                    const results = this.state.results;
+                    results.circuitBreakerLoading = false;
+                    results.error = "Error"
+                    this.setState({
+                        results
+                    })
+                    console.log(res);
+                } else {
+                    const results = this.state.results;
+                    results.circuitBreakerLoading = false;
+                    results.circuitBreakerEnabled = false;
+                    results.error = null;
+                    this.setState({
+                        results
+                    })
+                }
+            }).catch(error => {
+                console.log(error)
+                this.setState({
+                    results: {
+                        circuitBreakerLoading: false,
+                        error: "Error"
+                    }
+                })
+            })
+        }
     }
 
     onChangeCollect = (enable) => {
@@ -75,6 +230,12 @@ class HomepageContainer extends Component {
                 tokenManager.removeResourceSwitch().then(res => {
                     if (res.error_code) {
                         console.log(res);
+                        this.setState({
+                            collect: {
+                                loading: false,
+                                error: "Error"
+                            }
+                        })
                     } else {
                         this.setState({
                             collect: {
@@ -86,7 +247,15 @@ class HomepageContainer extends Component {
                             }
                         })
                     }
-                }).catch(error => console.log(error))
+                }).catch(error => {
+                    console.log(error)
+                    this.setState({
+                        collect: {
+                            loading: false,
+                            error: "Error"
+                        }
+                    })
+                })
             } else {
                 const collect = this.state.collect;
                 collect.loading = true;
@@ -96,6 +265,12 @@ class HomepageContainer extends Component {
                 tokenManager.createResourceSwitch().then(res => {
                     if (res.error_code) {
                         console.log(res);
+                        this.setState({
+                            collect: {
+                                loading: false,
+                                error: "Error"
+                            }
+                        })
                     } else {
                         this.setState({
                             collect: {
@@ -107,7 +282,15 @@ class HomepageContainer extends Component {
                             }
                         })
                     }
-                }).catch(error => console.log(error))
+                }).catch(error => {
+                    console.log(error)
+                    this.setState({
+                        collect: {
+                            loading: false,
+                            error: "Error"
+                        }
+                    })
+                })
             }
         }
     }
@@ -115,7 +298,7 @@ class HomepageContainer extends Component {
     loadCollectStatus = () => {
         tokenManager.getCollectStatus().then(
             response => {
-                if (response.error_code) {
+                if (response.data.error_code) {
                     this.setState({
                         collect: {
                             error: response.data.user_message,
@@ -140,7 +323,7 @@ class HomepageContainer extends Component {
     loadResultsStatus = () => {
         tokenManager.getResultsStatus().then(
             response => {
-                if (response.error_code) {
+                if (response.data.error_code) {
                     this.setState({
                         results: {
                             error: response.data.user_message,
@@ -160,6 +343,30 @@ class HomepageContainer extends Component {
                 }
             }
         ).catch(error => console.log(error));
+
+        const results = this.state.results;
+        results.circuitBreakerLoading = true;
+        this.setState({
+            results
+        });
+        tokenManager.getCircuitBreakerStatus().then(
+            response => {
+                const results = this.state.results;
+                results.circuitBreakerLoading = false;
+                results.circuitBreakerEnabled = (response.data.status === "enabled")
+                this.setState({
+                    results
+                });
+            }
+        ).catch(error => {
+            console.log(error);
+            const results = this.state.results;
+            results.error = "Unknown error";
+            results.circuitBreakerLoading = false;
+            this.setState({
+                results
+            });
+        })
     }
 
     loadStatus = async () => {
@@ -172,9 +379,13 @@ class HomepageContainer extends Component {
             name={this.props.name}
             collect={this.state.collect}
             results={this.state.results}
+            metrics={this.state.metrics}
             cb={{
                 onChangeCollect: this.onChangeCollect,
-                onClickRetrieve: this.onClickRetrieve
+                onClickRetrieve: this.onClickRetrieve,
+                onChangeCircuitBreaker: this.onChangeBreaker,
+                startTest: this.startTest,
+                stopTest: this.stopTest
             }}
         />
     }

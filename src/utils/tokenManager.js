@@ -107,4 +107,16 @@ export default class tokenManager {
     static getResults() {
         return this.client.getResults();
     }
+
+    static enableCircuitBreaker() {
+        return this.client.postCircuitBreakerSwitch();
+    }
+
+    static disableCircuitBreaker() {
+        return this.client.deleteCircuitBreakerSwitch();
+    }
+
+    static getCircuitBreakerStatus() {
+        return this.client.getCircuitBreakerStatus();
+    }
 }

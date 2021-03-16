@@ -4,7 +4,7 @@ import MetricsPanel from './MetricsPanel';
 import CollectPanel from './CollectPanel';
 import ResultsPanel from './ResultsPanel';
 
-function Homepage({ name, collect, results, cb }) {
+function Homepage({ name, collect, results, metrics, cb }) {
     return <div>
         <Row>
             <Col>
@@ -16,14 +16,10 @@ function Homepage({ name, collect, results, cb }) {
         <Row>
             <Col>
                 <CollectPanel collect={collect} cb={cb} />
+                <MetricsPanel metrics={metrics} cb={cb}/>
             </Col>
             <Col>
                 <ResultsPanel results={results} cb={cb} />
-            </Col>
-        </Row>
-        <Row>
-            <Col>
-                <MetricsPanel cb={cb}/>
             </Col>
         </Row>
     </div>

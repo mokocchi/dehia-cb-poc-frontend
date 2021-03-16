@@ -26,7 +26,8 @@ const ResultsPanel = ({ results, cb }) => {
     const rLoading = results.loading;
     const rResultsLoading = results.resultsLoading;
     const rData = results.data;
-    const rBreakerEnabled = results.rBreakerEnabled;
+    const rBreakerEnabled = results.circuitBreakerEnabled;
+    const rBreakerLoading = results.circuitBreakerLoading;
 
     return (<Card>
         <Card.Header><h3>Results Service</h3></Card.Header>
@@ -37,15 +38,18 @@ const ResultsPanel = ({ results, cb }) => {
                         <Alert variant={resultsVariant(results)}>
                             <Row>
                                 <Col>
-                                    Status: {rError ? rError : (rResultsLoading? "Fetching results..." : rStatus)} <br/>
-                                    Circuit Breaker: {rBreakerEnabled? "Enabled" : "Disabled"} <br/><br/>
+                                    Status: {rError ? rError : (rResultsLoading ? "Fetching results..." : rStatus)} <br />
+                                    Circuit Breaker: {rBreakerEnabled ? "Enabled" : "Disabled"} <br /><br />
                                 </Col>
                             </Row>
                             <Row>
                                 <Col>
                                     <Button onClick={cb.onClickRetrieve}>Retrieve results <Icon name="download" font="MaterialCommunityIcons" color="white" size={"1.5rem"} /></Button>
-                                    {rBreakerEnabled ? <Button variant="secondary" onClick={cb.onClickCircuitBreaker} className="float-right"> Disable Circuit Breaker <Icon name="pipe" font="MaterialCommunityIcons" color="white" size={"1.5rem"} /></Button>
-                                    : <Button variant="warning" onClick={cb.onClickCircuitBreaker} className="float-right"> Enable Circuit Breaker <Icon name="pipe-disconnected" font="MaterialCommunityIcons" color="white" size={"1.5rem"} /></Button>}
+                                    {rBreakerLoading ? <LoadSpinner />
+                                        :
+                                        rBreakerEnabled ? <Button variant="secondary" onClick={_ => cb.onChangeCircuitBreaker(false)} className="float-right"> Disable Circuit Breaker <Icon name="pipe" font="MaterialCommunityIcons" color="white" size={"1.5rem"} /></Button>
+                                            : <Button variant="warning" onClick={_ => cb.onChangeCircuitBreaker(true)} className="float-right"> Enable Circuit Breaker <Icon name="pipe-disconnected" font="MaterialCommunityIcons" color="white" size={"1.5rem"} /></Button>
+                                    }
                                 </Col>
                             </Row>
                             <Row>
@@ -77,7 +81,7 @@ const ResultsPanel = ({ results, cb }) => {
                 </Row>
             )}
         </Card.Body>
-    </Card>)
+    </Card >)
 }
 
 export default ResultsPanel;

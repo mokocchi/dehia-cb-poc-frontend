@@ -118,4 +118,16 @@ export default class APIClient {
     getResults() {
         return this.authorizedGetRequest('/results');
     }
+
+    postCircuitBreakerSwitch() {
+        return this.authorizedPostRequest('/circuit-breaker-switch');
+    }
+
+    deleteCircuitBreakerSwitch() {
+        return this.authorizedDeleteRequest('/circuit-breaker-switch')
+    }
+
+    getCircuitBreakerStatus() {
+        return this.authorizedGetRequest('/circuit-breaker-switch')
+    }
 }
