@@ -96,7 +96,6 @@ class HomepageContainer extends Component {
             })
         }
         const avg = elapsedTimes.reduce((x, y) => x + y) / 10;
-        const avg2 = elapsedTimes.slice(1, 9).reduce((x, y) => x + y) / 9;
         const max = elapsedTimes.reduce((x, y) => (x > y) ? x : y);
         const min = elapsedTimes.reduce((x, y) => (x < y) ? x : y);
         metrics.loading = false;
