@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, BrowserRouter } from 'react-router-dom';
+import { Route, HashRouter } from 'react-router-dom';
 import { Container } from 'react-bootstrap'
 
 import './App.css';
@@ -10,12 +10,12 @@ import Login from './screens/Main/Login';
 
 function App() {
   return (
-    <BrowserRouter basename="/">
+    <HashRouter basename="/">
       <Container style={{ marginTop: '1em' }}>
         <Route path="/" exact component={User(Homepage)} />
         <Route path="/login" component={Login} />
       </Container>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
