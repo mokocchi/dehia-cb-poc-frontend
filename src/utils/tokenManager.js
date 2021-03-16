@@ -1,5 +1,5 @@
 import { apiUserFound, apiUserExpired, loadingApiUser } from '../redux/actions';
-import { expired, expiresAt, verifyJWTSignature } from './utils';
+import { expired, verifyJWTSignature } from './utils';
 import APIClient from './APIClient';
 
 export default class tokenManager {
@@ -21,6 +21,7 @@ export default class tokenManager {
                     if (auth) {
                         this.storeUserIfValidJWT(auth)
                     } else {
+                        console.log("Couldn't fetch login data")
                         this.expireUser()
                     }
                 }
@@ -35,7 +36,7 @@ export default class tokenManager {
         const token = auth.token;
         const jwtContents = verifyJWTSignature(token);
         if (jwtContents) {
-            const storedAuth = { token, expiresAt: expiresAt(jwtContents.exp) }
+            const storedAuth = { token, expiresAt: jwtContents.exp * 1000 }
             this.client.setAuth(storedAuth);
             this.storeApiUser(storedAuth);
             this.store.dispatch(apiUserFound({

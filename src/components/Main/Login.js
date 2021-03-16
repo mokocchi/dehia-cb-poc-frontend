@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { loadingApiUser } from "../../redux/actions";
 import tokenManager from "../../utils/tokenManager";
 import LoadSpinner from "../UI/LoadSpinner";
+import Menu from "../UI/Menu";
 
 class Login extends Component {
 
@@ -16,7 +17,10 @@ class Login extends Component {
         this.props.history.push("/")
     }
     render() {
-        return <LoadSpinner />
+        return (<div>
+            <Menu loggedIn={false} />
+            <LoadSpinner />
+        </div>)
     }
 }
 

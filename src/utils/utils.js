@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import { JWT_PUBLIC_KEY } from '../config';
 
 export function expired(expiresAt) {
     return Date.now() > expiresAt;

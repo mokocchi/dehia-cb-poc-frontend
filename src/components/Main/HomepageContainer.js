@@ -15,6 +15,7 @@ class HomepageContainer extends Component {
             },
             results: {
                 loading: true,
+                resultsLoading: false,
                 error: null
             },
         }
@@ -26,7 +27,7 @@ class HomepageContainer extends Component {
 
     onClickRetrieve = _ => {
         const results = this.state.results;
-        results.loading = true;
+        results.resultsLoading = true;
         this.setState({
             results
         })
@@ -35,7 +36,7 @@ class HomepageContainer extends Component {
                 if (response.data.error_code) {
                     const results = {};
                     results.error = response.data.user_message;
-                    results.loading = false;
+                    results.resultsLoading = false;
                     this.setState({
                         results
                     })
@@ -43,15 +44,19 @@ class HomepageContainer extends Component {
                     const results = {};
                     results.status = "OK";
                     results.data = response.data.results;
-                    results.loading = false;
+                    results.resultsLoading = false;
                     this.setState({
                         results
                     })
                 }
             } else {
                 const results = {};
-                results.error = "Error";
-                results.loading = false;
+                if(response.developer_message) {
+                    results.error = response.developer_message;
+                } else {
+                    results.error = "Unknown Error";
+                }
+                results.resultsLoading = false;
                 this.setState({
                     results
                 })

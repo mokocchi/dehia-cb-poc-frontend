@@ -39,13 +39,11 @@ export default class APIClient {
         return auth && auth.token && !expired(auth.expiresAt);
     }
 
-    loginFromStoredTokenId() {
-        tokenManager.login();
-    }
-
     async authorizedRequest(uri, parameters = {}, json = true) {
         if (!this.validAuth(this.auth)) {
-            this.loginFromStoredTokenId();
+            console.log("Time's up, please log in again...")
+            alert("Time is up! Please log in again");
+            tokenManager.expireUser();
         }
         parameters.headers = {
             "Authorization": "Bearer " + this.auth.token,
@@ -54,8 +52,12 @@ export default class APIClient {
         try {
             return await axios({ url: API_BASE_URL + uri, method: parameters.method, data: parameters.body || {}, headers: parameters.headers });
         } catch (error) {
-            return {
-                user_message: "There was an error", error_code: 0
+            if(error.response.data) {
+                return error.response.data
+            } else {
+                return {
+                    user_message: "There was an error", error_code: 0
+                }
             }
         }
     }
