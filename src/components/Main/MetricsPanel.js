@@ -8,11 +8,19 @@ const MetricsPanel = ({ metrics, cb }) => {
                 <h3>Test the current configuration</h3>
             </Card.Header>
             <Card.Body className="metrics-card-body">
+                <Alert variant="warning"><ol>
+                    <li>
+                        Metrics are taken from the frontend
+                                </li>
+                    <li>
+                        b) The worst case scenario may take up to 3 minutes
+                                    </li>
+                </ol>
+                </Alert>
                 {!metrics.testStarted ? <Button onClick={cb.startTest} variant="primary">Start test</Button>
                     :
                     <div>
                         <Row>
-                            <Alert variant="info">*Metrics are taken from the frontend, and includes the trip [frontend -&gt; gateway -&gt; service1 (-&gt;service2 -&gt; service1) -&gt; gateway -&gt; frontend]</Alert>
                             <Col>
                                 <progress value={metrics.step} max="10"> 32% </progress>
                             </Col>
@@ -41,7 +49,7 @@ const MetricsPanel = ({ metrics, cb }) => {
                     </div>
                 }
             </Card.Body>
-        </Card>
+        </Card >
     )
 }
 
