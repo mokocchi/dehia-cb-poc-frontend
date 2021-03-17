@@ -32,8 +32,7 @@ export default class APIClient {
                 }
             }
         ).catch(error => {
-            console.log(error);
-            return null
+            throw error;
         })
     }
 

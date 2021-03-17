@@ -65,6 +65,13 @@ export default class tokenManager {
                         }
                         this.expireUser();
                     }
+                }).catch(error => {
+                    if (error.response.error_code) {
+                        console.log(error.response.user_message);
+                    } else {
+                        console.log("Unknown error");
+                    }
+                    this.expireUser();
                 });
         } else {
             return token;
