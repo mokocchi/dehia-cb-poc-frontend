@@ -13,7 +13,7 @@ const MetricsPanel = ({ metrics, cb }) => {
                         Metrics are taken from the frontend
                                 </li>
                     <li>
-                        b) The worst case scenario may take up to 3 minutes
+                        The worst case scenario may take up to 3 minutes
                                     </li>
                 </ol>
                 </Alert>
