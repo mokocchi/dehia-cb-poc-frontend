@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col, Row } from 'react-bootstrap';
+import { Alert, Col, Row } from 'react-bootstrap';
 import MetricsPanel from './MetricsPanel';
 import CollectPanel from './CollectPanel';
 import ResultsPanel from './ResultsPanel';
@@ -11,6 +11,7 @@ function Homepage({ name, collect, results, metrics, cb }) {
                 <h2>
                     {name}'s Session
                     </h2>
+                    <Alert variant="warning">The services and gateway are hosted on Heroku - Please be patient the first time you open the app</Alert>
             </Col>
         </Row>
         <Row>
