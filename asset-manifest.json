@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/dehia-cb-poc-frontend/static/css/main.00973be3.chunk.css",
-    "main.js": "/dehia-cb-poc-frontend/static/js/main.588be5b1.chunk.js",
-    "main.js.map": "/dehia-cb-poc-frontend/static/js/main.588be5b1.chunk.js.map",
+    "main.js": "/dehia-cb-poc-frontend/static/js/main.a416b94c.chunk.js",
+    "main.js.map": "/dehia-cb-poc-frontend/static/js/main.a416b94c.chunk.js.map",
     "runtime-main.js": "/dehia-cb-poc-frontend/static/js/runtime-main.e0e29872.js",
     "runtime-main.js.map": "/dehia-cb-poc-frontend/static/js/runtime-main.e0e29872.js.map",
-    "static/js/2.4024b2b9.chunk.js": "/dehia-cb-poc-frontend/static/js/2.4024b2b9.chunk.js",
-    "static/js/2.4024b2b9.chunk.js.map": "/dehia-cb-poc-frontend/static/js/2.4024b2b9.chunk.js.map",
+    "static/js/2.347fa3f5.chunk.js": "/dehia-cb-poc-frontend/static/js/2.347fa3f5.chunk.js",
+    "static/js/2.347fa3f5.chunk.js.map": "/dehia-cb-poc-frontend/static/js/2.347fa3f5.chunk.js.map",
     "index.html": "/dehia-cb-poc-frontend/index.html",
     "static/css/main.00973be3.chunk.css.map": "/dehia-cb-poc-frontend/static/css/main.00973be3.chunk.css.map",
-    "static/js/2.4024b2b9.chunk.js.LICENSE.txt": "/dehia-cb-poc-frontend/static/js/2.4024b2b9.chunk.js.LICENSE.txt",
+    "static/js/2.347fa3f5.chunk.js.LICENSE.txt": "/dehia-cb-poc-frontend/static/js/2.347fa3f5.chunk.js.LICENSE.txt",
     "static/media/Entypo.ttf": "/dehia-cb-poc-frontend/static/media/Entypo.a10f4124.ttf",
     "static/media/FontAwesome.ttf": "/dehia-cb-poc-frontend/static/media/FontAwesome.1e59d233.ttf",
     "static/media/Ionicons.ttf": "/dehia-cb-poc-frontend/static/media/Ionicons.fef568f6.ttf",
@@ -18,8 +18,8 @@
   },
   "entrypoints": [
     "static/js/runtime-main.e0e29872.js",
-    "static/js/2.4024b2b9.chunk.js",
+    "static/js/2.347fa3f5.chunk.js",
     "static/css/main.00973be3.chunk.css",
-    "static/js/main.588be5b1.chunk.js"
+    "static/js/main.a416b94c.chunk.js"
   ]
 }
