@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/dehia-cb-poc-frontend/static/css/main.00973be3.chunk.css",
-    "main.js": "/dehia-cb-poc-frontend/static/js/main.a416b94c.chunk.js",
-    "main.js.map": "/dehia-cb-poc-frontend/static/js/main.a416b94c.chunk.js.map",
+    "main.js": "/dehia-cb-poc-frontend/static/js/main.b2d69ea2.chunk.js",
+    "main.js.map": "/dehia-cb-poc-frontend/static/js/main.b2d69ea2.chunk.js.map",
     "runtime-main.js": "/dehia-cb-poc-frontend/static/js/runtime-main.e0e29872.js",
     "runtime-main.js.map": "/dehia-cb-poc-frontend/static/js/runtime-main.e0e29872.js.map",
     "static/js/2.347fa3f5.chunk.js": "/dehia-cb-poc-frontend/static/js/2.347fa3f5.chunk.js",
@@ -20,6 +20,6 @@
     "static/js/runtime-main.e0e29872.js",
     "static/js/2.347fa3f5.chunk.js",
     "static/css/main.00973be3.chunk.css",
-    "static/js/main.a416b94c.chunk.js"
+    "static/js/main.b2d69ea2.chunk.js"
   ]
 }
