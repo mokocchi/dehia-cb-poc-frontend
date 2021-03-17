@@ -32,7 +32,11 @@ const ChartsPanel = ({ metrics, cb }) => {
                                     }
                                 }]
                             },
-                            showLines: true
+                            showLines: true,
+                            title: {
+                                display: true,
+                                text: 'Response time (in ms) for each request'
+                            },
                         }
                         } />
                     </Col>
