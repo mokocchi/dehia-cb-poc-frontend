@@ -19,7 +19,8 @@ class HomepageContainer extends Component {
                 resultsLoading: false,
                 error: null,
                 circuitBreakerEnabled: false,
-                circuitBreakerLoading: false
+                circuitBreakerLoading: false,
+                data: null
             },
             metrics: {
                 testStarted: false,
@@ -118,6 +119,7 @@ class HomepageContainer extends Component {
                     const results = this.state.results;
                     results.error = response.user_message;
                     results.resultsLoading = false;
+                    results.data = null;
                     this.setState({
                         results
                     })
@@ -137,6 +139,7 @@ class HomepageContainer extends Component {
                 } else {
                     results.error = "Unknown Error";
                 }
+                results.data = null;
                 results.resultsLoading = false;
                 this.setState({
                     results
