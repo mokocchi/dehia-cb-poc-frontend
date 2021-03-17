@@ -10,14 +10,14 @@ export default class APIClient {
 
     async login() {
         return axios.post(TOKEN_AUTH_URL, {
-            //TODO: add ID
-            token: true
+                //TODO: add ID
+                token: true
         }).then(
-            async response => {
-                if(response.data) {
-                    if (response.data.error_code) {
-                        console.log(response.data);
-                    } else {
+            response => {
+                if (response.error_code) {
+                    console.log(response);
+                } else {
+                    if (response.data) {
                         const auth = {
                             token: response.data.accessToken,
                             expiresAt: expiresAt(response.data.expires_in)
@@ -25,12 +25,15 @@ export default class APIClient {
                         this.setAuth(auth);
                         return auth;
                     }
-                } else {
-                    console.log("Auth error")
+                    else {
+                        console.log("Auth error")
+                        return null
+                    }
                 }
             }
         ).catch(error => {
             console.log(error);
+            return null
         })
     }
 
@@ -52,7 +55,7 @@ export default class APIClient {
         try {
             return await axios({ url: API_BASE_URL + uri, method: parameters.method, data: parameters.body || {}, headers: parameters.headers });
         } catch (error) {
-            if(error.response.data) {
+            if (error.response.data) {
                 return error.response.data
             } else {
                 return {

@@ -54,12 +54,16 @@ export default class tokenManager {
         if (expired(token.expiresAt)) {
             this.login()
                 .then(response => {
-                    if(response.data) {
-                        if (response.data.error_code) {
-                            console.log("invalid ID")
+                    console.log(response);
+                    if (response.data) {
+                        this.storeUserIfValidJWT(response.data);
+                    } else {
+                        if (response.error_code) {
+                            console.log(response.user_message);
                         } else {
-                            this.storeUserIfValidJWT(response.data);
+                            console.log("Unknown error");
                         }
+                        this.expireUser();
                     }
                 });
         } else {

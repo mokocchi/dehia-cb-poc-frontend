@@ -11,9 +11,15 @@ class Login extends Component {
         this.props.dispatch(loadingApiUser())
         tokenManager.login().then(
             auth => {
-                tokenManager.storeUserIfValidJWT(auth)
+                if(auth) {
+                    tokenManager.storeUserIfValidJWT(auth);
+                } else {
+                    tokenManager.expireUser();
+                }
             }
-        )
+        ).catch(error => {
+            console.log(error)
+        })
         this.props.history.push("/")
     }
     render() {

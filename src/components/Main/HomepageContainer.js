@@ -56,7 +56,7 @@ class HomepageContainer extends Component {
         if (this.state.collect.status === "OK") {
             text[0] = "Operation should be normal. Sending first request...";
         } else {
-            if(this.state.results.circuitBreakerEnabled){
+            if (this.state.results.circuitBreakerEnabled) {
                 text[0] = "Circuit breaker enabled. Sending first request..."
             } else {
                 text[0] = "Circuit breaker disabled. Sending first request..."
@@ -81,7 +81,7 @@ class HomepageContainer extends Component {
             let failed;
             try {
                 const response = await tokenManager.getResults();
-                failed = response.data.error_code !== undefined;
+                failed = response.error_code !== undefined;
             } catch (e) {
                 failed = true;
             }
@@ -114,9 +114,9 @@ class HomepageContainer extends Component {
         })
         tokenManager.getResults().then(response => {
             if (response.data) {
-                if (response.data.error_code) {
+                if (response.error_code) {
                     const results = this.state.results;
-                    results.error = response.data.user_message;
+                    results.error = response.user_message;
                     results.resultsLoading = false;
                     this.setState({
                         results
@@ -153,15 +153,27 @@ class HomepageContainer extends Component {
                 results
             })
             tokenManager.enableCircuitBreaker().then(res => {
-                if (res.data.error_code) {
-                    console.log(res);
-                    this.setState({
-                        results: {
-                            circuitBreakerEnabled: false,
-                            circuitBreakerLoading: false,
-                            error: "Error"
-                        }
-                    })
+                if (res.status !== 200) {
+
+                    if (res.error_code) {
+                        console.log(res);
+                        this.setState({
+                            results: {
+                                circuitBreakerEnabled: false,
+                                circuitBreakerLoading: false,
+                                error: "Error"
+                            }
+                        })
+
+                    } else {
+                        console.log(res)
+                        const results = this.state.results;
+                        results.circuitBreakerLoading = false;
+                        results.error = "Unknown Error"
+                        this.setState({
+                            results
+                        })
+                    }
                 } else {
                     this.setState({
                         results: {
@@ -188,15 +200,24 @@ class HomepageContainer extends Component {
             this.setState({
                 results
             })
-            tokenManager.disableCircuitBreaker().then(res => {
-                if (res.data.error_code) {
-                    const results = this.state.results;
-                    results.circuitBreakerLoading = false;
-                    results.error = "Error"
-                    this.setState({
-                        results
-                    })
-                    console.log(res);
+            tokenManager.disableCircuitBreaker().then(response => {
+                if ((response.status !== 200) && (response.status !== 304)) {
+                    if (response.error_code) {
+                        this.setState({
+                            results: {
+                                error: response.user_message,
+                                loading: false,
+                            }
+                        })
+                    } else {
+                        console.log(response)
+                        const results = this.state.results;
+                        results.circuitBreakerLoading = false;
+                        results.error = "Unknown Error"
+                        this.setState({
+                            results
+                        })
+                    }
                 } else {
                     const results = this.state.results;
                     results.circuitBreakerLoading = false;
@@ -211,7 +232,7 @@ class HomepageContainer extends Component {
                 this.setState({
                     results: {
                         circuitBreakerLoading: false,
-                        error: "Error"
+                        error: "Unknown error"
                     }
                 })
             })
@@ -226,15 +247,24 @@ class HomepageContainer extends Component {
                 this.setState({
                     collect
                 })
-                tokenManager.removeResourceSwitch().then(res => {
-                    if (res.error_code) {
-                        console.log(res);
-                        this.setState({
-                            collect: {
-                                loading: false,
-                                error: "Error"
-                            }
-                        })
+                tokenManager.removeResourceSwitch().then(response => {
+                    if ((response.status !== 200) && (response.status !== 304)) {
+                        if (response.error_code) {
+                            this.setState({
+                                collect: {
+                                    error: response.user_message,
+                                    loading: false,
+                                }
+                            })
+                        } else {
+                            console.log(response)
+                            this.setState({
+                                collect: {
+                                    error: "Unknown error",
+                                    loading: false,
+                                }
+                            })
+                        }
                     } else {
                         this.setState({
                             collect: {
@@ -297,14 +327,24 @@ class HomepageContainer extends Component {
     loadCollectStatus = () => {
         tokenManager.getCollectStatus().then(
             response => {
-                if (response.data.error_code) {
+                if((response.status !== 200) && (response.status !== 304)) {
+                    if (response.error_code) {
+                        this.setState({
+                            collect: {
+                                error: response.user_message,
+                                loading: false,
+                                disabled: true
+                            }
+                        })
+                } else {
                     this.setState({
                         collect: {
-                            error: response.data.user_message,
+                            error: "Unknown error",
                             loading: false,
                             disabled: true
                         }
                     })
+                }
                 } else {
                     this.setState({
                         collect: {
@@ -316,20 +356,33 @@ class HomepageContainer extends Component {
                     })
                 }
             }
-        ).catch(error => console.log(error));
+        ).catch(error => {
+            console.log(error)
+        });
     }
 
     loadResultsStatus = () => {
         tokenManager.getResultsStatus().then(
             response => {
-                if (response.data.error_code) {
-                    this.setState({
-                        results: {
-                            error: response.data.user_message,
-                            loading: false,
-                            disabled: true
-                        }
-                    })
+                if ((response.status !== 200) && (response.status !== 304)) {
+                    if (response.error_code) {
+                        this.setState({
+                            results: {
+                                error: response.user_message,
+                                loading: false,
+                                disabled: true
+                            }
+                        })
+                    } else {
+                        console.log(response)
+                        this.setState({
+                            results: {
+                                error: "Unknown error",
+                                loading: false,
+                                disabled: true
+                            }
+                        })
+                    }
                 } else {
                     this.setState({
                         results: {
@@ -341,7 +394,9 @@ class HomepageContainer extends Component {
                     })
                 }
             }
-        ).catch(error => console.log(error));
+        ).catch(error => {
+            console.log(error)
+        });
 
         const results = this.state.results;
         results.circuitBreakerLoading = true;
