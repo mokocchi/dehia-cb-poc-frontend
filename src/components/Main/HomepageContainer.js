@@ -1,8 +1,17 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { REQUEST_COUNT } from '../../config';
 import tokenManager from '../../utils/tokenManager';
 import Homepage from './Homepage';
 
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 class HomepageContainer extends Component {
     constructor() {
         super();
@@ -27,13 +36,24 @@ class HomepageContainer extends Component {
                 step: 0,
                 text: [],
                 loading: false,
-                stop: false
+                stop: false,
+                data: false,
+                datasets: []
             }
         }
     }
 
     componentDidMount() {
         this.loadStatus();
+    }
+
+    onClickClear = _ => {
+        const metrics = this.state.metrics;
+        metrics.data = false;
+        metrics.datasets = [];
+        this.setState({
+            metrics
+        })
     }
 
     stopTest = _ => {
@@ -49,6 +69,7 @@ class HomepageContainer extends Component {
         let metrics = this.state.metrics;
         metrics.testStarted = true;
         metrics.stop = false;
+        metrics.step = 0;
         this.setState({
             metrics
         })
@@ -69,7 +90,7 @@ class HomepageContainer extends Component {
         this.setState({
             metrics
         })
-        for (let index = 1; index <= 10; index++) {
+        for (let index = 1; index <= REQUEST_COUNT; index++) {
             if (this.state.metrics.stop) {
                 text[text.length] = "Test stopped";
                 metrics.text = text;
@@ -80,15 +101,22 @@ class HomepageContainer extends Component {
             }
             const time1 = Date.now();
             let failed;
+            let cached = false;
             try {
                 const response = await tokenManager.getResults();
-                failed = response.error_code !== undefined;
+                if(response.data.results) {
+                    console.log(response.data.results[0])
+                    cached = response.data.results[0] === "old";
+                } else {
+                    failed = true;
+                }
             } catch (e) {
+                console.log(e);
                 failed = true;
             }
             const time2 = Date.now();
             const interval = new Date(time2).getTime() - new Date(time1).getTime();
-            text[index] = `Request ${index}. Elapsed time: ${interval}ms (${failed ? "Failed" : "Success"})`;
+            text[index] = `Request ${index}. Elapsed time: ${interval}ms (${failed ? "Failed" : (cached ? "Substitute results" : "Success")})`;
             elapsedTimes[index - 1] = interval;
             metrics.step = index;
             metrics.text = text;
@@ -96,12 +124,27 @@ class HomepageContainer extends Component {
                 metrics
             })
         }
-        const avg = elapsedTimes.reduce((x, y) => x + y) / 10;
+        const avg = elapsedTimes.reduce((x, y) => x + y) / REQUEST_COUNT;
         const max = elapsedTimes.reduce((x, y) => (x > y) ? x : y);
         const min = elapsedTimes.reduce((x, y) => (x < y) ? x : y);
         metrics.loading = false;
-        text[11] = `Average: ${avg.toFixed(2)}ms.`;
-        text[12] = `Max time: ${max}ms. Min time: ${min}ms`;
+        text[text.length] = `Average: ${avg.toFixed(2)}ms.`;
+        text[text.length] = `Max time: ${max}ms. Min time: ${min}ms`;
+        metrics.text = text;
+        metrics.data = true;
+        console.log("Test result:");
+        console.log(elapsedTimes);
+
+        const datasets = metrics.datasets;
+        const color = getRandomColor();
+        datasets[datasets.length] = {
+            label: `Test ${(datasets.length + 1)}`,
+            fill: false,
+            backgroundColor: color,
+            borderColor: color,
+            data: elapsedTimes.map((x, index) => { return { x: (index + 1), y: x } })
+        }
+        metrics.datasets = datasets;
         this.setState({
             metrics
         });
@@ -330,7 +373,7 @@ class HomepageContainer extends Component {
     loadCollectStatus = () => {
         tokenManager.getCollectStatus().then(
             response => {
-                if((response.status !== 200) && (response.status !== 304)) {
+                if ((response.status !== 200) && (response.status !== 304)) {
                     if (response.error_code) {
                         this.setState({
                             collect: {
@@ -339,15 +382,15 @@ class HomepageContainer extends Component {
                                 disabled: true
                             }
                         })
-                } else {
-                    this.setState({
-                        collect: {
-                            error: "Unknown error",
-                            loading: false,
-                            disabled: true
-                        }
-                    })
-                }
+                    } else {
+                        this.setState({
+                            collect: {
+                                error: "Unknown error",
+                                loading: false,
+                                disabled: true
+                            }
+                        })
+                    }
                 } else {
                     this.setState({
                         collect: {
@@ -442,7 +485,8 @@ class HomepageContainer extends Component {
                 onClickRetrieve: this.onClickRetrieve,
                 onChangeCircuitBreaker: this.onChangeBreaker,
                 startTest: this.startTest,
-                stopTest: this.stopTest
+                stopTest: this.stopTest,
+                onClickClear: this.onClickClear
             }}
         />
     }

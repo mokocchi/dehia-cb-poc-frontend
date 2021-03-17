@@ -13,3 +13,8 @@
     display: flex;
     justify-content: space-between;
 }
+
+.metrics-card-body {
+    overflow-y: scroll;
+    height: 30rem;
+}

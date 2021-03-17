@@ -3,6 +3,7 @@ import { Alert, Col, Row } from 'react-bootstrap';
 import MetricsPanel from './MetricsPanel';
 import CollectPanel from './CollectPanel';
 import ResultsPanel from './ResultsPanel';
+import ChartsPanel from './ChartsPanel';
 
 function Homepage({ name, collect, results, metrics, cb }) {
     return <div>
@@ -21,6 +22,7 @@ function Homepage({ name, collect, results, metrics, cb }) {
             </Col>
             <Col>
                 <ResultsPanel results={results} cb={cb} />
+                {metrics.data && <ChartsPanel metrics={metrics} cb={cb}/>}
             </Col>
         </Row>
     </div>

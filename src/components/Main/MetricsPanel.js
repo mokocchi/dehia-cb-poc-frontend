@@ -7,7 +7,7 @@ const MetricsPanel = ({ metrics, cb }) => {
             <Card.Header>
                 <h3>Test the current configuration</h3>
             </Card.Header>
-            <Card.Body>
+            <Card.Body className="metrics-card-body">
                 {!metrics.testStarted ? <Button onClick={cb.startTest} variant="primary">Start test</Button>
                     :
                     <div>
