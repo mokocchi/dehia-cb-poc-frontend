@@ -1,7 +1,8 @@
 import React from 'react';
-import { Card, Row, Col, Button } from 'react-bootstrap';
-import { Bar, Line } from 'react-chartjs-2';
+import { Card, Row, Col, Button, Alert } from 'react-bootstrap';
+import { Bar } from 'react-chartjs-2';
 import { REQUEST_COUNT } from '../../config';
+import Icon from 'react-web-vector-icons';
 
 const generateLabels = _ => {
     const labels = [];
@@ -20,6 +21,7 @@ const ChartsPanel = ({ metrics, cb }) => {
             <Card.Body>
                 <Row>
                     <Col>
+                    <Alert variant="info"><Icon name="information" font="MaterialCommunityIcons" size={"1rem"} /> <b>Bar colors.</b> Green: Success. Yellow: Substitute Results. Red: Fail.</Alert>
                         <Bar data={{
                             labels: generateLabels(),
                             datasets: metrics.datasets

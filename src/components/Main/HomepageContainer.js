@@ -145,7 +145,7 @@ class HomepageContainer extends Component {
             borderColor: elapsedTimes.map(x => "black"),
             borderWidth: "1",
             data: elapsedTimes.map((x, index) => { return { x: (index + 1), y: x[0] } }),
-            type: "bar"
+            type: "bar",
         };
         datasets[datasets.length] = {
             label: `Test ${count} (lines)`,
@@ -155,6 +155,7 @@ class HomepageContainer extends Component {
             data: elapsedTimes.map((x, index) => { return { x: (index + 1), y: x[0] } }),
             type: "line",
             showLines: true,
+            lineTension: 0
         };
         metrics.datasets = datasets;
         this.setState({
