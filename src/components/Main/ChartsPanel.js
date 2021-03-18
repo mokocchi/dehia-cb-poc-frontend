@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Row, Col, Button } from 'react-bootstrap';
-import { Line } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2';
 import { REQUEST_COUNT } from '../../config';
 
 const generateLabels = _ => {
@@ -20,7 +20,7 @@ const ChartsPanel = ({ metrics, cb }) => {
             <Card.Body>
                 <Row>
                     <Col>
-                        <Line data={{
+                        <Bar data={{
                             labels: generateLabels(),
                             datasets: metrics.datasets
                         }} options={{
@@ -29,6 +29,16 @@ const ChartsPanel = ({ metrics, cb }) => {
                                     ticks: {
                                         suggestedMin: 0,
                                         suggestedMax: 8000
+                                    }, 
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: "Response time (in ms)"
+                                    }
+                                }],
+                                xAxes: [{
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: "Request number"
                                     }
                                 }]
                             },
@@ -37,6 +47,11 @@ const ChartsPanel = ({ metrics, cb }) => {
                                 display: true,
                                 text: 'Response time (in ms) for each request'
                             },
+                            tooltips: {
+                                callbacks: {
+                                    label: (item) => `${item.yLabel} ms`,
+                                },
+                            }
                         }
                         } />
                     </Col>

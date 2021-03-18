@@ -12,17 +12,25 @@ function Homepage({ name, collect, results, metrics, cb }) {
                 <h2>
                     {name}'s Session
                     </h2>
-                    <Alert variant="warning">The services and gateway are hosted on Heroku - Please be patient the first time you open the app</Alert>
+                <Alert variant="warning">The services and gateway are hosted on Heroku - Please be patient the first time you open the app</Alert>
             </Col>
         </Row>
         <Row>
             <Col>
                 <CollectPanel collect={collect} cb={cb} />
-                <MetricsPanel metrics={metrics} cb={cb}/>
             </Col>
             <Col>
                 <ResultsPanel results={results} cb={cb} />
-                {metrics.data && <ChartsPanel metrics={metrics} cb={cb}/>}
+            </Col>
+        </Row>
+        <Row>
+            <Col>
+                <MetricsPanel metrics={metrics} cb={cb} />
+            </Col>
+        </Row>
+        <Row>
+            <Col>
+                {metrics.data && <ChartsPanel metrics={metrics} cb={cb} />}
             </Col>
         </Row>
     </div>

@@ -104,8 +104,7 @@ class HomepageContainer extends Component {
             let cached = false;
             try {
                 const response = await tokenManager.getResults();
-                if(response.data.results) {
-                    console.log(response.data.results[0])
+                if (response.data.results) {
                     cached = response.data.results[0] === "old";
                 } else {
                     failed = true;
@@ -116,17 +115,19 @@ class HomepageContainer extends Component {
             }
             const time2 = Date.now();
             const interval = new Date(time2).getTime() - new Date(time1).getTime();
-            text[index] = `Request ${index}. Elapsed time: ${interval}ms (${failed ? "Failed" : (cached ? "Substitute results" : "Success")})`;
-            elapsedTimes[index - 1] = interval;
+            const outcome = failed ? "Failed" : (cached ? "Substitute results" : "Success");
+            text[index] = `Request ${index}. Elapsed time: ${interval}ms (${outcome})`;
+            elapsedTimes[index - 1] = [interval, outcome];
             metrics.step = index;
             metrics.text = text;
             this.setState({
                 metrics
             })
         }
-        const avg = elapsedTimes.reduce((x, y) => x + y) / REQUEST_COUNT;
-        const max = elapsedTimes.reduce((x, y) => (x > y) ? x : y);
-        const min = elapsedTimes.reduce((x, y) => (x < y) ? x : y);
+        const times = elapsedTimes.map(x => x[0]);
+        const avg = times.reduce((x, y) => x + y) / REQUEST_COUNT;
+        const max = times.reduce((x, y) => (x > y) ? x : y);
+        const min = times.reduce((x, y) => (x < y) ? x : y);
         metrics.loading = false;
         text[text.length] = `Average: ${avg.toFixed(2)}ms.`;
         text[text.length] = `Max time: ${max}ms. Min time: ${min}ms`;
@@ -137,13 +138,24 @@ class HomepageContainer extends Component {
 
         const datasets = metrics.datasets;
         const color = getRandomColor();
+        const count= Math.round(datasets.length / 2) + 1;
         datasets[datasets.length] = {
-            label: `Test ${(datasets.length + 1)}`,
+            label: `Test ${count} (bars)`,
+            backgroundColor: elapsedTimes.map(x => (x[1] === "Failed") ? "red" : (x[1] === "Success" ? "green" : "yellow")),
+            borderColor: elapsedTimes.map(x => "black"),
+            borderWidth: "1",
+            data: elapsedTimes.map((x, index) => { return { x: (index + 1), y: x[0] } }),
+            type: "bar"
+        };
+        datasets[datasets.length] = {
+            label: `Test ${count} (lines)`,
             fill: false,
-            backgroundColor: color,
             borderColor: color,
-            data: elapsedTimes.map((x, index) => { return { x: (index + 1), y: x } })
-        }
+            borderWidth: "3",
+            data: elapsedTimes.map((x, index) => { return { x: (index + 1), y: x[0] } }),
+            type: "line",
+            showLines: true,
+        };
         metrics.datasets = datasets;
         this.setState({
             metrics
