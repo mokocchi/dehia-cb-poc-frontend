@@ -97,6 +97,7 @@ You can install the frontend either in containerized version using Docker or loc
  ```
  yarn deploy
  ```
+ 16. Go to your repository settings, enable GitHub Pages, and set the GitHub Pages branch to `gh-pages`
  16. Go to `https://<your-github-user>.github.io/<your-repository>`. You should see a loading message, or the login page if the gateway is running.
 
  ## Deploying to Heroku
@@ -115,16 +116,15 @@ You can install the frontend either in containerized version using Docker or loc
   heroku create
   ```
   3. You can now change the app name if you want at the Heroku [Dashboard](https://dashboard.heroku.com/)
-  4. Set the [Environment Variables](#Environment-Variables) from the Dashboard
-  5. Set the stack to `container`
+  4. Set the stack to `container`
   ```
   heroku stack:set container
   ```
-  6. Push app to heroku
+  5. Push app to heroku
   ```
   git push heroku master
   ```
-  7. Go to `https://<your-app>.herokuapp.com`. You should see a loading message, or the login page if the gateway is running.
+  6. Go to `https://<your-app>.herokuapp.com`. You should see a loading message, or the login page if the gateway is running.
   
   ## Environment Variables
   - **GATEWAY_URL**: URL of the Gateway. If you're using Docker in the frontend and the gateway at the same time, create a network first (`docker network create <poc-network>`) and then run the other containers. Run `docker network inspect <poc-network>` to get the IP address of the other container and take note. Don't forget to add the port if it's different from Port `80`.
